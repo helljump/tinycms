@@ -1,17 +1,16 @@
-"""
-todo: robots.txt
-todo: feed/
-todo: sitemap.xml
-"""
+# TODO: robots.txt
+# TODO: feed/
+# TODO: sitemap.xml
 
 import os
 import sqlite3
 from datetime import datetime
-
+from slugify import slugify
 from flask import Flask, g, render_template, redirect, flash, request, session,\
     url_for
+import logging
 
-from forms import ContactForm, LoginForm
+from forms import ContactForm, LoginForm, ArticleForm
 
 app = Flask(__name__)
 app.config.update(dict(
@@ -103,11 +102,40 @@ def logout():
     return redirect(url_for('index'))
 
 
+# TODO: protect view
+@app.route('/edit', methods=['GET', 'POST'])
+@app.route('/edit/<int:post_id>', methods=['GET', 'POST'])
+def edit_article(post_id=None):
+    form = ArticleForm()
+    db = get_db()
+    if request.method == 'POST' and form.validate():
+        slug = slugify(form.title.data, max_length=50)
+        data = [
+            slug,
+            form.title.data,
+            form.intro.data,
+            form.text.data,
+            form.date.data,
+            form.published.data,
+            form.description.data,
+            form.keywords.data
+        ]
+        if form.pk.data is not None:
+            pass
+        else:
+            db.execute("insert into articles (slug, title, intro, text, date, published, "
+                       "description, keywords) values(?,?,?,?,?,?,?,?)", data)
+            db.commit()
+            return redirect(url_for('index'))
+    if request.method == 'GET':
+        if post_id is not None:
+            cur = db.execute("select * from articles where id=?", [post_id])
+            article = cur.fetchone();
+    return render_template('edit.html', form=form)
+
+
 @app.route('/')
 def index():
-    #db = get_db()
-    #cur = db.execute('select title, text from entries order by id desc')
-    #entries = cur.fetchall()
     return render_template('base.html')#, entries=entries)
 
 

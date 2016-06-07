@@ -1,8 +1,9 @@
 from datetime import datetime
 
 from flask_wtf import Form, RecaptchaField
-from wtforms import StringField, TextAreaField, DateTimeField, BooleanField
-from wtforms.validators import DataRequired, Length
+from wtforms import StringField, TextAreaField, DateTimeField, BooleanField, IntegerField
+from wtforms.widgets import HiddenInput
+from wtforms.validators import DataRequired, Length, Optional
 
 
 class ContactForm(Form):
@@ -16,7 +17,8 @@ class LoginForm(Form):
     password = StringField('password', validators=[DataRequired()])
 
 
-class EditForm(Form):
+class ArticleForm(Form):
+    pk = IntegerField(widget=HiddenInput(), validators=[Optional()])
     title = StringField('Заголовок', validators=[DataRequired()])
     intro = TextAreaField('Интро', validators=[DataRequired()])
     text = TextAreaField('Текст')

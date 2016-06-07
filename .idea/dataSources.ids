@@ -8,9 +8,12 @@
       <column name="id" sqlType="INTEGER" precision="0" scale="-1" nullable="true" jdbcType="4"/>
       <column name="slug" sqlType="TEXT(50)" precision="0" scale="-1" nullable="false" jdbcType="12"/>
       <column name="title" sqlType="TEXT(200)" precision="0" scale="-1" nullable="false" jdbcType="12"/>
+      <column name="intro" sqlType="TEXT" precision="0" scale="-1" nullable="false" jdbcType="12"/>
       <column name="text" sqlType="TEXT" precision="0" scale="-1" nullable="false" jdbcType="12"/>
       <column name="date" sqlType="DATETIME" precision="0" scale="-1" nullable="false" jdbcType="12"/>
       <column name="published" sqlType="BOOLEAN" precision="0" scale="-1" nullable="true" jdbcType="4"/>
+      <column name="description" sqlType="TEXT" precision="0" scale="-1" nullable="true" jdbcType="12"/>
+      <column name="keywords" sqlType="TEXT" precision="0" scale="-1" nullable="true" jdbcType="12"/>
       <primary-key columns="id"/>
     </table>
     <table name="sqlite_sequence" schema="" catalog="" type="TABLE">
