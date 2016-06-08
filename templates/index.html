@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+{% block main %}
+
+    {% for article in articles %}
+              <div class="blog-post">
+                <h2 class="blog-post-title"><a href="{{ url_for('view_article', slug=article.slug) }}">{{ article.title }}</a></h2>
+                <p class="blog-post-meta">{{ article.date }}</p>
+                {{ article.intro|safe }}
+              </div>
+    {% endfor %}
+
+    <nav>
+        <ul class="pager">
+            <li><a href="#">Previous</a></li>
+            <li><a href="#">Next</a></li>
+        </ul>
+    </nav>
+
+{% endblock main %}
+

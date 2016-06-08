@@ -1,21 +1,22 @@
 {% extends 'base.html' %}
 {% macro input(name) -%}
       <div class="form-group {% if name.errors %}has-error{% endif %}">
-        <label for="{{ name.short_name }}" class="col-sm-3 control-label">{{ name.label }}</label>
+        {% if name.type != 'SubmitField' %}
+            <label for="{{ name.short_name }}" class="col-sm-3 control-label">
+                {{ name.label }}</label>
+        {% else %}
+            <div class="col-sm-3"></div>
+        {% endif %}
         <div class="col-sm-9">
           {{ name(**kwargs) }}
         </div>
       </div>
 {%- endmacro %}
 {% block main %}
-    <form class="form-horizontal" action="{{ url_for('login') }}" method="post">
+    <form class="form-horizontal" action="{{ url_for('login', next=next) }}" method="post">
         {{ form.hidden_tag() }}
         {{ input(form.name) }}
         {{ input(form.password, type="password") }}
-      <div class="form-group">
-        <div class="col-sm-offset-3 col-sm-9">
-          <button type="submit" class="btn btn-default">Отправить</button>
-        </div>
-      </div>
+        {{ input(form.submit, class="btn btn-default") }}
     </form>
 {% endblock %}
