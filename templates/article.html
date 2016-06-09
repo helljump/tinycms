@@ -6,7 +6,7 @@
 
   <div class="blog-post">
     <h2 class="blog-post-title">{{ article.title }}</h2>
-    <p class="blog-post-meta">{{ article.date }}
+    <p class="blog-post-meta">{{ article.date|date }}
         {% if session.logged_in %}<a href="{{ url_for('edit_article', post_id=article.id) }}">Редактировать</a>{% endif %}
     </p>
     {{ article.intro|safe }}

@@ -2,6 +2,7 @@
 # TODO: feed/
 # TODO: sitemap.xml
 
+
 import functools
 import os
 import sqlite3
@@ -11,9 +12,12 @@ from flask import Flask, g, render_template, redirect, flash, request, session,\
     url_for, abort
 from werkzeug.utils import secure_filename
 from flask_wtf import CsrfProtect
-
+from flask_babel import Babel, format_datetime
+import time
 from forms import ContactForm, LoginForm, ArticleForm
+from pagination import Pagination
 
+PER_PAGE = 2
 
 app = Flask(__name__)
 app.config.update(dict(
@@ -26,10 +30,13 @@ app.config.update(dict(
     RECAPTCHA_PRIVATE_KEY='6Ld54iETAAAAAHm0sjKT-C8WJng7ilRfl2qNqcEr',
     WTF_CSRF_SECRET_KEY='ubILYBLIyb8867gb*^BOybhliiigb',
     UPLOAD_FOLDER=os.path.join(app.static_folder, 'uploads'),
-    ALLOWED_EXTENSIONS=['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif']
+    ALLOWED_EXTENSIONS=['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'],
+    BABEL_DEFAULT_LOCALE='ru'
+    #BABEL_DEFAULT_TIMEZONE='Europe/Moscow'
 ))
 
 CsrfProtect(app)
+Babel(app)
 
 
 def connect_db():
@@ -74,11 +81,21 @@ def login_required(fn):
 
 @app.context_processor
 def inject_utils():
-    def get_dt(fmt='%d.%m.%Y'):
-        return datetime.now().strftime(fmt)
+
+    def get_dt(fmt='dd MMMM YY'):
+        return format_datetime(datetime.now(), fmt)
+
     return dict(
         now=get_dt
     )
+
+
+@app.template_filter('date')
+def _jinja2_filter_datetime(date, fmt=None):
+    if fmt:
+        return format_datetime(date, fmt)
+    else:
+        return format_datetime(date, 'dd MMMM YY, HH:mm')
 
 
 @app.route('/contact', methods=('GET', 'POST'))
@@ -120,7 +137,6 @@ def logout():
     return redirect(url_for('index'))
 
 
-# TODO: protect view
 @app.route('/edit', methods=['GET', 'POST'])
 @app.route('/edit/<int:post_id>', methods=['GET', 'POST'])
 @login_required
@@ -184,29 +200,42 @@ def allowed_file(filename):
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload_file():
-    # TODO: create uniq name
     file = request.files['file']
     if not file.filename.strip():
         abort(400)
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
-        file.save(os.path.join(app.config['UPLOAD_FOLDER'], filename))
-        return '/static/uploads/%s' % filename
+        fout = os.path.join(app.config['UPLOAD_FOLDER'], filename)
+        if os.path.exists(fout):
+            egg = os.path.splitext(fout)
+            fout = "{}{:x}{}".format(egg[0], int(time.time()*10), egg[1])
+            app.logger.debug("make new name %s", fout)
+        file.save(fout)
+        return '/static/uploads/{}'.format(filename)
     abort(400)
 
 
 @app.route('/')
 def index():
-    # TODO: pagination
     db = get_db()
-
+    try:
+        page = int(request.args.get('p', 1))
+    except ValueError:
+        page = 1
     search_query = request.args.get('q')
     if search_query:
-        pass #query = Entry.search(search_query)
+        egg = "%{}%".format(search_query[:20])
+        articles = db.execute("select slug, title, intro, date from articles "
+                              "where published and (title like ? or intro like ?) "
+                              "order by date desc limit ?", [egg, egg, PER_PAGE])
+        pagination = Pagination(1, PER_PAGE, PER_PAGE)
     else:
-        cur = db.execute("select slug, title, intro, date from articles where published "
-                     "order by date desc")
-    return render_template('index.html', articles=cur)
+        cnt = db.execute("select count(*) from articles where published").fetchone()[0]
+        pagination = Pagination(page, PER_PAGE, cnt)
+        articles = db.execute("select slug, title, intro, date from articles where published "
+                              "order by date desc "
+                              "limit ? offset ?", [PER_PAGE, (pagination.page-1)*PER_PAGE])
+    return render_template('index.html', articles=articles, pagination=pagination)
 
 
 if __name__ == '__main__':

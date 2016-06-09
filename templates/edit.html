@@ -1,21 +1,31 @@
 {% extends 'base.html' %}
 {% macro input(name) -%}
       <div class="form-group {% if name.errors %}has-error{% endif %}">
-        <label for="{{ name.short_name }}" class="col-sm-12 control-label">{{ name.label }}</label>
+        <label for="{{ name.short_name }}" class="control-label">{{ name.label }}</label>
             <br/>{{ name(**kwargs) }}
       </div>
 {%- endmacro %}
 {% block header %}
      <link href="//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.css" rel="stylesheet">
+     <link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
 {% endblock %}
 {% block main %}
     <form class="form" action="{{ url_for('edit_article', pk=pk) }}" method="post">
         {{ form.hidden_tag() }}
-        <div class="form-group {% if form.date.errors %}has-error{% endif %}">
+        <div class="row">
+        <div class="form-group col-sm-6 {% if form.date.errors %}has-error{% endif %}">
             <label for="{{ form.date.short_name }}" class="control-label">{{ form.date.label }}</label>
-                {{ form.date }}
+                <div class='input-group date' id='datepicker'>
+                    {{ form.date(class="form-control") }}
+                    <span class="input-group-addon">
+                        <span class="glyphicon glyphicon-calendar"></span>
+                    </span>
+                </div>
+        </div>
+        <div class="form-group col-sm-6">
             <label for="{{ form.published.short_name }}" class="control-label">{{ form.published.label }}</label>
-                {{ form.published }}
+                    <br/>{{ form.published }}
+        </div>
         </div>
         {{ input(form.title, class="form-control") }}
         {{ input(form.intro, class="form-control", rows="3", id='intro') }}
@@ -28,8 +38,17 @@
 {% endblock %}
 {% block footer %}
     <script src="//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.js"></script>
+    <script src="/static/js/moment.min.js"></script>
+    <script src="/static/js/locales.min.js"></script>
+    <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
     <script>
         $(document).ready(function() {
+
+            $('#datepicker').datetimepicker({
+                locale: 'ru',
+                format: 'YYYY-MM-DD HH:mm:ss'
+            });
+
             var csrftoken = "{{ csrf_token() }}";
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {
