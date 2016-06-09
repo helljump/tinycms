@@ -198,6 +198,7 @@ def allowed_file(filename):
 @app.route('/upload', methods=['POST'])
 @login_required
 def upload_file():
+    #app.logger.debug('upload file %s', request.files)
     file = request.files['file']
     if not request.is_xhr:
         abort(401)

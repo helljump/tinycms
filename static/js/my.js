@@ -10,14 +10,13 @@
                 }
               });
               return button.render();
-            }
+            };
 
             $('#datepicker').datetimepicker({
                 locale: 'ru',
                 format: 'YYYY-MM-DD HH:mm:ss'
             });
 
-            var csrftoken = "{{ csrf_token() }}";
             $.ajaxSetup({
                 beforeSend: function(xhr, settings) {
                     if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
@@ -26,8 +25,8 @@
                 }
             });
 
-            $('#intro').summernote({
-                height: 100,
+            var cfg = {
+                height: 170,
                 callbacks: {
                     onImageUpload: function (files) {
                         var note = $(this);
@@ -45,18 +44,10 @@
                     ['mybutton', ['hello']]
                 ],
                 buttons: {
-                   hello: HelloButton
+                    hello: HelloButton
                 }
-            });
-            $('#text').summernote({
-                height: 400,
-                callbacks: {
-                    onImageUpload: function (files) {
-                        var note = $(this);
-                        sendFile(files[0], note);
-                    }
-                }
-            });
+            };
+
             function sendFile(file, note) {
                 var data = new FormData();
                 data.append("file", file);
@@ -74,5 +65,10 @@
                         })
                     }
                 });
-            }            
+            };
+
+            $('#intro').summernote(cfg);
+            cfg.height = 400;
+            $('#text').summernote(cfg);
+
         });
