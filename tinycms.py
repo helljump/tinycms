@@ -81,10 +81,8 @@ def login_required(fn):
 
 @app.context_processor
 def inject_utils():
-
     def get_dt(fmt='dd MMMM YY'):
         return format_datetime(datetime.now(), fmt)
-
     return dict(
         now=get_dt
     )
@@ -201,8 +199,10 @@ def allowed_file(filename):
 @login_required
 def upload_file():
     file = request.files['file']
+    if not request.is_xhr:
+        abort(401)
     if not file.filename.strip():
-        abort(400)
+        abort(401)
     if file and allowed_file(file.filename):
         filename = secure_filename(file.filename)
         fout = os.path.join(app.config['UPLOAD_FOLDER'], filename)
@@ -212,7 +212,7 @@ def upload_file():
             app.logger.debug("make new name %s", fout)
         file.save(fout)
         return '/static/uploads/{}'.format(filename)
-    abort(400)
+    abort(401)
 
 
 @app.route('/')

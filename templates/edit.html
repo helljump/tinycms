@@ -6,7 +6,7 @@
       </div>
 {%- endmacro %}
 {% block header %}
-     <link href="//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.css" rel="stylesheet">
+     <link href="/static/css/summernote.css" rel="stylesheet">
      <link href="/static/css/bootstrap-datetimepicker.min.css" rel="stylesheet">
 {% endblock %}
 {% block main %}
@@ -37,60 +37,9 @@
     </form>
 {% endblock %}
 {% block footer %}
-    <script src="//cdnjs.cloudflare.com/ajax/libs/summernote/0.8.1/summernote.js"></script>
+    <script src="/static/js/summernote.min.js"></script>
     <script src="/static/js/moment.min.js"></script>
     <script src="/static/js/locales.min.js"></script>
     <script src="/static/js/bootstrap-datetimepicker.min.js"></script>
-    <script>
-        $(document).ready(function() {
-
-            $('#datepicker').datetimepicker({
-                locale: 'ru',
-                format: 'YYYY-MM-DD HH:mm:ss'
-            });
-
-            var csrftoken = "{{ csrf_token() }}";
-            $.ajaxSetup({
-                beforeSend: function(xhr, settings) {
-                    if (!/^(GET|HEAD|OPTIONS|TRACE)$/i.test(settings.type) && !this.crossDomain) {
-                        xhr.setRequestHeader("X-CSRFToken", csrftoken)
-                    }
-                }
-            });
-
-            $('#intro').summernote({
-                height: 100,
-                callbacks: {
-                    onImageUpload: function (files) {
-                        var note = $(this);
-                        sendFile(files[0], note);
-                    }
-                }
-            });
-            $('#text').summernote({
-                height: 400,
-                callbacks: {
-                    onImageUpload: function (files) {
-                        var note = $(this);
-                        sendFile(files[0], note);
-                    }
-                }
-            });
-            function sendFile(file, note) {
-                var data = new FormData();
-                data.append("file", file);
-                $.ajax({
-                    data: data,
-                    type: "POST",
-                    url: "/upload",
-                    cache: false,
-                    contentType: false,
-                    processData: false,
-                    success: function(url) {
-                        note.summernote('insertImage', url);
-                    }
-                });
-            }
-        });
-    </script>
+    <script src="/static/js/my.js"></script>
 {% endblock %}
