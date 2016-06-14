@@ -23,12 +23,12 @@ app = Flask(__name__)
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'articles.db'),
     DEBUG=True,
-    SECRET_KEY='wdcig3624dYISD68goyg*G^G*^)TGUTsd',
+    SECRET_KEY='unknown',
     USERNAME='admin',
     PASSWORD='default',
-    RECAPTCHA_PUBLIC_KEY='6Ld54iETAAAAACIPaOotIXvhboTihxFU5F6Hrb-e',
-    RECAPTCHA_PRIVATE_KEY='6Ld54iETAAAAAHm0sjKT-C8WJng7ilRfl2qNqcEr',
-    WTF_CSRF_SECRET_KEY='ubILYBLIyb8867gb*^BOybhliiigb',
+    RECAPTCHA_PUBLIC_KEY='unknown',
+    RECAPTCHA_PRIVATE_KEY='unknown',
+    WTF_CSRF_SECRET_KEY='unknown',
     UPLOAD_FOLDER=os.path.join(app.static_folder, 'uploads'),
     ALLOWED_EXTENSIONS=['txt', 'pdf', 'png', 'jpg', 'jpeg', 'gif'],
     BABEL_DEFAULT_LOCALE='ru'
